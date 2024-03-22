@@ -1,0 +1,9 @@
+wallet.mnemonic.phrase: rebuild dust festival jewel caught library boss goat gap else patient have
+wallet.address (0): 0x6e245E37FE584C7ec0A1A5362c583E43bd95E972
+wallet.privateKey (0): 0x46f8b88ee391fd98c2a7655b8b218e414eac047c9c84331c483c2a7f6a43204a
+wallet.address (1): 0x175553f6dD064a8E2319ecF387623D6b77e8cEA9
+wallet.privateKey (1): 0x69eec1d0275a91658683e41c9b0437db34cd27d05c56e92368323c2ab22e3e82
+wallet.address (2): 0xAb64fE69EB7d0ED30aeb7Ae4209f080097187FEB
+wallet.privateKey (2): 0xd6b64cc79284c980420ee6facdb82e2749eebe477589f747a6276b732c1a5ff4
+wallet.address (3): 0x16839C1E26c4e64673702b9ED18130725fcc81e7
+wallet.privateKey (3): 0x15ba0c53820cdd20d0d4d162f7bf6c01d6c0d41be62a2b45e17e4587a304d9e8
