@@ -5,12 +5,12 @@ import * as dotenv from "dotenv";
 
 // @ts-ignore
 import abiDefinition from "../contract-definition/trail.json" assert { type: "json" };
-import { TrailRecordAddService } from "../services/trailRecordAddService";
+import { TrailInclusionService } from "../services/trailInclusion";
 
 async function run() {
     dotenv.config();
 
-    const { LOG_LEVEL, EVM_ENDPOINT, CONTROLLER_PRIVATE_KEY, TRAIL_ID, TRAIL_RECORD } = process.env;
+    const { LOG_LEVEL, EVM_ENDPOINT, TRAIL_ID, INCLUSION_DETAILS } = process.env;
 
     App.logger = new Logger({
         minLevel: parseInt(LOG_LEVEL ?? "2", 10)
@@ -21,27 +21,30 @@ async function run() {
         process.exit(-1);
     }
 
-    if (!CONTROLLER_PRIVATE_KEY) {
-        App.LError("Please supply the controller's private key");
-        process.exit(-1);
-    }
-
     if (!TRAIL_ID) {
         App.LError("Please provide a Trail ID");
         process.exit(-1);
     }
 
-    const additionService = new TrailRecordAddService(EVM_ENDPOINT, CONTROLLER_PRIVATE_KEY);
-
-    if (!TRAIL_RECORD) {
-        App.LError("Please provide a Trails' Record");
+    if (!INCLUSION_DETAILS) {
+        App.LError("Please provide inclusion details");
         process.exit(-1);
     }
-    const record = JSON.parse(TRAIL_RECORD);
 
-    const nextStateIndex = await additionService.addRecordToTrail(TRAIL_ID, record);
+    App.LDebug(INCLUSION_DETAILS);
+    const inclusionDetails = JSON.parse(INCLUSION_DETAILS);
 
-    App.LDebug("Trail next state index", nextStateIndex);
+    const inclusionService = new TrailInclusionService(EVM_ENDPOINT);
+
+    const record = inclusionDetails.record;
+    const immutable = inclusionDetails.immutable;
+    const stateIndex = inclusionDetails.stateIndex;
+
+    App.LDebug(record, immutable, stateIndex);
+
+    const inclusionResult = await inclusionService.isIncluded(TRAIL_ID, record, stateIndex, immutable);
+
+    App.LDebug("Inclusion result", inclusionResult);
 }
 
 run()

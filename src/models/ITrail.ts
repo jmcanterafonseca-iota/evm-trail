@@ -10,7 +10,7 @@ export interface ITrail {
         updated: string;
         controller: string;
         governor: string;
-        lastTrailState: Uint8Array;
+        lastTrailStateHash: Uint8Array;
         firstInclusionBlock?: number;
         lastInclusionBlock?: number;
     };

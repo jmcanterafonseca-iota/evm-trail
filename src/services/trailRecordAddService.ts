@@ -20,7 +20,7 @@ export class TrailRecordAddService {
 
         const trailData = await resolver.resolveTrail(trailId);
 
-        const lastTrailState = trailData.meta.lastTrailState;
+        const lastTrailState = trailData.meta.lastTrailStateHash;
 
         const provider = new ethers.WebSocketProvider(this.evmEndpoint);
         const signer = new Wallet(this.controllerPrivateKey, provider);

@@ -34,7 +34,7 @@
             },
             {
                 "internalType": "bytes32",
-                "name": "fromState",
+                "name": "fromStateHash",
                 "type": "bytes32"
             }
         ],
@@ -77,6 +77,37 @@
                 "internalType": "address",
                 "name": "",
                 "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint32",
+                "name": "_stateIndex",
+                "type": "uint32"
+            }
+        ],
+        "name": "getTrailState",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "state",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "blockNumber",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct TraiContract.TrailState",
+                "name": "",
+                "type": "tuple"
             }
         ],
         "stateMutability": "view",
@@ -136,7 +167,7 @@
     },
     {
         "inputs": [],
-        "name": "lastTrailState",
+        "name": "lastTrailStateHash",
         "outputs": [
             {
                 "internalType": "bytes32",
@@ -188,37 +219,6 @@
                 "internalType": "string",
                 "name": "",
                 "type": "string"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint32",
-                "name": "_stateIndex",
-                "type": "uint32"
-            }
-        ],
-        "name": "trailState",
-        "outputs": [
-            {
-                "components": [
-                    {
-                        "internalType": "bytes32",
-                        "name": "state",
-                        "type": "bytes32"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "blockNumber",
-                        "type": "uint256"
-                    }
-                ],
-                "internalType": "struct TraiContract.TrailState",
-                "name": "",
-                "type": "tuple"
             }
         ],
         "stateMutability": "view",

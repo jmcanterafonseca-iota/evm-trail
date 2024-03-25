@@ -4,6 +4,7 @@ import abiDefinition from "../contract-definition/trail.json" assert { type: "js
 import { ethers, Contract } from "ethers";
 import { ITrail } from "../models/ITrail";
 import { App } from "../utils/app";
+import { TrailHelper } from "../helpers/trailHelper";
 
 export class TrailResolver {
     private readonly evmEndpoint: string;
@@ -13,13 +14,11 @@ export class TrailResolver {
     }
 
     public async resolveTrail(trailID: string): Promise<ITrail> {
-        new URL(trailID);
-        const components = trailID.split(":");
-        const smartContractAdress = components[components.length - 1];
+        const smartContractAddress = TrailHelper.extractSmartContractAddress(trailID);
 
         const provider = new ethers.WebSocketProvider(this.evmEndpoint);
 
-        const contract = new Contract(smartContractAdress, abiDefinition, provider);
+        const contract = new Contract(smartContractAddress, abiDefinition, provider);
 
         const trailData = await contract.trail();
 
@@ -31,7 +30,7 @@ export class TrailResolver {
         }
 
         const record = JSON.parse(trailData[1]);
-        const stateIndex = trailData[2] as number;
+        const stateIndex = Number(trailData[2]);
 
         const governor = await contract.governorAddress();
         const controller = await contract.controllerAddress();
@@ -39,8 +38,11 @@ export class TrailResolver {
         const created = new Date(Number(trailData[3]) * 1000).toISOString();
         const updated = new Date(Number(trailData[4]) * 1000).toISOString();
 
-        const lastTrailState = await contract.lastTrailState();
-        App.LDebug(lastTrailState);
+        const lastTrailStateHash = await contract.lastTrailStateHash();
+        App.LDebug("Last trail State Hash", lastTrailStateHash);
+
+        const firstTrailState = await contract.getTrailState(0);
+        const lastTrailState = await contract.getTrailState(stateIndex);
 
         return {
             trail: {
@@ -54,7 +56,9 @@ export class TrailResolver {
                 updated,
                 governor,
                 controller,
-                lastTrailState
+                lastTrailStateHash,
+                firstInclusionBlock: Number(firstTrailState[1]),
+                lastInclusionBlock: Number(lastTrailState[1])
             }
         };
     }

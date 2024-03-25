@@ -13,7 +13,8 @@ import abiDefinition from "../contract-definition/trail.json" assert { type: "js
 async function run() {
     dotenv.config();
 
-    const { LOG_LEVEL, EVM_ENDPOINT, GOVERNOR_PRIVATE_KEY, GOVERNOR_ADDRESS, CONTROLLER_ADDRESS } = process.env;
+    const { LOG_LEVEL, EVM_ENDPOINT, GOVERNOR_PRIVATE_KEY, GOVERNOR_ADDRESS, CONTROLLER_ADDRESS, TRAIL_DETAILS } =
+        process.env;
 
     App.logger = new Logger({
         minLevel: parseInt(LOG_LEVEL ?? "2", 10)
@@ -31,27 +32,31 @@ async function run() {
 
     const creationService = new TrailCreationService(EVM_ENDPOINT, GOVERNOR_PRIVATE_KEY);
 
+    if (!TRAIL_DETAILS) {
+        App.LError("Please supply the Trails's initial record / immutable");
+        process.exit(-1);
+    }
+
+    const trailDetails = JSON.parse(TRAIL_DETAILS);
     const trailData: ITrailData = {
         governorAddress: GOVERNOR_ADDRESS,
         controllerAddress: CONTROLLER_ADDRESS,
-        record: {
-            hello: "world"
-        }
+        record: trailDetails.record,
+        immutable: trailDetails.immutable
     };
 
     const smartContract = await creationService.createTrail(trailData);
 
     App.LDebug("Smart Contract Address", smartContract);
 
-    const provider = new ethers.WebSocketProvider(EVM_ENDPOINT);
     // Now obtaining the Trail ID
+    const provider = new ethers.WebSocketProvider(EVM_ENDPOINT);
     const contract = new Contract(smartContract, abiDefinition, provider);
-
     const result = await contract.trailID();
     App.LDebug("TrailID", result);
 
-    const trailState = await contract.trailState(0);
-    App.LDebug(trailState);
+    const trailState = await contract.getTrailState(0);
+    App.LDebug("Last Trail's state", trailState);
 }
 
 run()
