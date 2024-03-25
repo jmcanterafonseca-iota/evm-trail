@@ -1,11 +1,13 @@
 // @ts-ignore
-import abiDefinition from "../contract-definition/trail.json" assert { type: "json" };
+import contractDefinition from "../contract-definition/TrailContract.json" assert { type: "json" };
 
 import { Contract, ethers } from "ethers";
 import { TrailHelper } from "../helpers/trailHelper";
 import { TrailResolver } from "./trailResolver";
 import { App } from "../utils/app";
 import { IInclusionResult } from "../models/IInclusionResult";
+
+const abiDefinition = contractDefinition.abi;
 
 export class TrailInclusionService {
     private readonly evmEndpoint: string;
@@ -39,7 +41,7 @@ export class TrailInclusionService {
 
         const contract = new Contract(smartContractAddress, abiDefinition, provider);
 
-        const trailState = await contract.trailState(inState);
+        const trailState = await contract.getTrailState(inState);
 
         // trailState[0] is the hash and trailState[1] is the block number
 

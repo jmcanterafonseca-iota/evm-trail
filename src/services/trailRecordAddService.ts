@@ -2,7 +2,9 @@ import { App } from "../utils/app";
 
 import { ethers, Wallet, Contract, TransactionResponse } from "ethers";
 // @ts-ignore
-import abiDefinition from "../contract-definition/trail.json" assert { type: "json" };
+import contractDefinition from "../contract-definition/TrailContract.json" assert { type: "json" };
+
+const abiDefinition = contractDefinition.abi;
 
 import { TrailResolver } from "./trailResolver";
 

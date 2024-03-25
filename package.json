@@ -11,7 +11,7 @@
       "lint-fix": "tslint -c tslint.json --fix 'src/**/*.ts'",
       "compile": "tsc",
       "clean": "rimraf './es/*' './typings/*'",
-      "copy": "copyfiles -u 1 src/**/*.bytecode es/",
+      "copy": "copyfiles -u 1 src/contract-definition/** es",
       "prettier": "prettier --config .prettierrc 'src/**/*' --write",
       "start": "node --es-module-specifier-resolution=node ./es/index.js"
     },

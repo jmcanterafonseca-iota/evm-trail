@@ -1,0 +1,24 @@
+{
+    "name": "trails-poc-smart-contracts",
+    "version": "0.1.0",
+    "description": "Trails Smart Contract Deployment",
+    "main": "truffle-config.js",
+    "directories": {
+      "test": "test"
+    },
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "build": "truffle build"
+    },
+    "author": "IOTA Foundation",
+    "license": "MIT",
+    "dependencies": {
+      "dotenv": "^16.3.1",
+      "@openzeppelin/contracts": "^4.0.0"
+    },
+    "devDependencies": {
+      "@truffle/hdwallet-provider": "^2.1.15",
+      "truffle": "^5.11.5"
+    }
+  }
+  

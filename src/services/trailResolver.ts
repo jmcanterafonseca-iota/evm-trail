@@ -1,10 +1,12 @@
 // @ts-ignore
-import abiDefinition from "../contract-definition/trail.json" assert { type: "json" };
+import contractDefinition from "../contract-definition/TrailContract.json" assert { type: "json" };
 
 import { ethers, Contract } from "ethers";
 import { ITrail } from "../models/ITrail";
 import { App } from "../utils/app";
 import { TrailHelper } from "../helpers/trailHelper";
+
+const abiDefinition = contractDefinition.abi;
 
 export class TrailResolver {
     private readonly evmEndpoint: string;

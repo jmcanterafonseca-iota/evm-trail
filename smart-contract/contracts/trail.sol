@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 /**
   * Trails Smart Contracrt 
   */
-contract TraiContract {
+contract TrailContract {
     address public immutableIssuerAddress;
 
     address public governorAddress;
@@ -25,7 +25,7 @@ contract TraiContract {
 
     Trail public trail;
 
-    bytes32 public lastTrailState;
+    bytes32 public lastTrailStateHash;
 
     struct TrailState {
         bytes32 state;
@@ -59,14 +59,14 @@ contract TraiContract {
         trail.created = block.timestamp;
         trail.updated = block.timestamp;
 
-        lastTrailState = calculateLastState();
-        trailStates.push(TrailState(lastTrailState, block.number));
+        lastTrailStateHash = calculateLastState();
+        trailStates.push(TrailState(lastTrailStateHash, block.number));
     }
 
     /**
      *. Returns the Trail State at a particular state Index.
      */
-    function trailState(uint32 _stateIndex) external view returns (TrailState memory) {
+    function getTrailState(uint32 _stateIndex) external view returns (TrailState memory) {
         if (_stateIndex > trail.stateIndex) {
             revert("Invalid state index");
         }
@@ -87,8 +87,8 @@ contract TraiContract {
         return trail.immutableData;
     }
 
-    function addRecord(string calldata recordData, bytes32 fromState) external onlyController {
-        if (lastTrailState != fromState) {
+    function addRecord(string calldata recordData, bytes32 fromStateHash) external onlyController {
+        if (lastTrailStateHash != fromStateHash) {
             revert("Invalid state");
         }
 
@@ -97,8 +97,8 @@ contract TraiContract {
 
         trail.updated = block.timestamp;
 
-         lastTrailState = calculateLastState();
-         trailStates.push(TrailState(lastTrailState, block.number));
+         lastTrailStateHash = calculateLastState();
+         trailStates.push(TrailState(lastTrailStateHash, block.number));
     }
 
     function changeController(address newController) external onlyGovernor {
@@ -120,6 +120,6 @@ contract TraiContract {
     }
 
     function calculateLastState() internal view returns(bytes32) {
-        return keccak256(abi.encode(address(this), trail.recordData, trail.stateIndex));
+        return keccak256(abi.encode(address(this), controllerAddress, trail.recordData, trail.stateIndex));
     }
 }
