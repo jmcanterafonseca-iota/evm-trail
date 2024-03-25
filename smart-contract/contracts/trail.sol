@@ -8,22 +8,26 @@ import "@openzeppelin/contracts/utils/Strings.sol";
   * Trails Smart Contracrt 
   */
 contract TrailContract {
+    // Address which funded the Trail
     address public immutableIssuerAddress;
 
     address public governorAddress;
     address public controllerAddress;
 
-    string[] public trailType;
-
     struct Trail {
         string immutableData;
         string recordData;
         uint32 stateIndex;
+    }
+
+    struct TrailMeta {
         uint created;
         uint updated;
+        string[] trailType;
     }
 
     Trail public trail;
+    TrailMeta public meta;
 
     TrailState public firstTrailState;
     TrailState public lastTrailState;
@@ -46,19 +50,25 @@ contract TrailContract {
     event TrailRecordAdded(address indexed controller, uint32 stateIndex, bytes32 indexed stateHash);
 
     // Constructor is a special function which runs automatically on deployment.
-    constructor(address governor, address controller, string memory immutableData, string memory recordData) {
+    constructor(address governor, address controller, string memory immutableData, string memory recordData, string memory trailType) {
         immutableIssuerAddress = msg.sender;
 
         governorAddress = governor;
         controllerAddress = controller;
-        trailType.push("TRAIL:1.0");
+
+        meta.trailType.push("TRAIL:1.0");
+        bytes memory trailTypeBytes = bytes(trailType);
+        if (trailTypeBytes.length > 0) {
+            meta.trailType.push(trailType);
+        }
+        
         trail.stateIndex = 0;
 
         trail.immutableData = immutableData;
         trail.recordData = recordData;
 
-        trail.created = block.timestamp;
-        trail.updated = block.timestamp;
+        meta.created = block.timestamp;
+        meta.updated = block.timestamp;
 
         lastTrailState = TrailState(calculateLastState(), block.number);
         firstTrailState = lastTrailState;
@@ -88,7 +98,7 @@ contract TrailContract {
         trail.recordData = recordData;
         trail.stateIndex = trail.stateIndex + 1;
 
-        trail.updated = block.timestamp;
+        meta.updated = block.timestamp;
 
          lastTrailState = TrailState(calculateLastState(), block.number);
 

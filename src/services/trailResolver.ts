@@ -37,8 +37,9 @@ export class TrailResolver {
         const governor = await contract.governorAddress();
         const controller = await contract.controllerAddress();
 
-        const created = new Date(Number(trailData[3]) * 1000).toISOString();
-        const updated = new Date(Number(trailData[4]) * 1000).toISOString();
+        const metaData = await contract.meta();
+        const created = new Date(Number(metaData[0]) * 1000).toISOString();
+        const updated = new Date(Number(metaData[1]) * 1000).toISOString();
 
         const firstTrailState = await contract.firstTrailState();
         const lastTrailState = await contract.lastTrailState();

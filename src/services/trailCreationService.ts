@@ -48,7 +48,8 @@ export class TrailCreationService {
             governor,
             controller,
             JSON.stringify(data.immutable),
-            JSON.stringify(data.record)
+            JSON.stringify(data.record),
+            ""
         );
         App.LDebug("Waiting for deployment of Trail's SC ...", await contract.getAddress());
         await contract.waitForDeployment();
