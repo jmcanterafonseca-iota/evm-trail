@@ -25,14 +25,20 @@ export class TrailInclusionService {
         const resolution = new TrailResolver(this.evmEndpoint);
         const trail = await resolution.resolveTrail(trailID);
 
+        const claims = {
+            stateIndex: inState,
+            record,
+            immutable: immutableData
+        };
+
         if (trail.trail.stateIndex < inState) {
-            return { included: false };
+            return { claims, inclusionProofed: false };
         }
 
         if (immutableData) {
             const toCheck = JSON.stringify(immutableData);
             if (toCheck !== JSON.stringify(trail.trail.immutable)) {
-                return { included: false };
+                return { claims, inclusionProofed: false };
             }
         }
 
@@ -40,10 +46,6 @@ export class TrailInclusionService {
         const provider = new ethers.WebSocketProvider(this.evmEndpoint);
 
         const contract = new Contract(smartContractAddress, abiDefinition, provider);
-
-        const trailState = await contract.getTrailState(inState);
-
-        // trailState[0] is the hash and trailState[1] is the block number
 
         // Let's calculate the corresponding hash and compare with the hash of that state
         // The hash is the SC address || controller address || record || stateIndex
@@ -53,21 +55,37 @@ export class TrailInclusionService {
             ["address", "address", "string", "uint32"],
             [smartContractAddress, trail.meta.controller, JSON.stringify(record), inState]
         );
-
         const hash = ethers.keccak256(encodingResult);
+        App.LDebug("Hash:", hash);
 
-        App.LDebug("Hash:", hash, "Trail State: ", trailState[0]);
+        // Here we need to query the contract's log so that it is found the corresponding entry
+        const filter = await contract.filters.TrailRecordAdded(null, null, hash).getTopicFilter();
 
-        const blockDetails = await provider.getBlock(trailState[1]);
+        const logs = await provider.getLogs({
+            fromBlock: trail.meta.firstInclusionBlock,
+            toBlock: "latest",
+            address: smartContractAddress,
+            topics: filter
+        });
 
-        if (hash === trailState[0]) {
-            return {
-                included: true,
-                blockNumber: Number(trailState[1]),
-                timestamp: new Date(blockDetails.timestamp * 1000).toISOString()
-            };
+        if (logs.length === 0) {
+            return { claims, inclusionProofed: false };
         }
 
-        return { included: false };
+        const logEntry = logs[0];
+
+        const blockDetails = await logEntry.getBlock();
+
+        return {
+            claims,
+            inclusionProofed: true,
+            proof: {
+                type: "IotaSmartContractChainProofOfInclusion2024",
+                transactionHash: logEntry.transactionHash,
+                transactionIndex: logEntry.transactionIndex,
+                blockNumber: Number(blockDetails.number),
+                timestamp: new Date(blockDetails.timestamp * 1000).toISOString()
+            }
+        };
     }
 }

@@ -56,8 +56,8 @@ async function run() {
     const result = await contract.trailID();
     App.LDebug("TrailID", result);
 
-    const trailState = await contract.getTrailState(0);
-    App.LDebug("Last Trail's state", trailState);
+    const trailState = await contract.lastTrailState();
+    App.LDebug("Last Trail's state", trailState[0]);
 }
 
 run()

@@ -25,14 +25,13 @@ contract TrailContract {
 
     Trail public trail;
 
-    bytes32 public lastTrailStateHash;
+    TrailState public firstTrailState;
+    TrailState public lastTrailState;
 
     struct TrailState {
         bytes32 state;
         uint blockNumber;
     }
-
-    TrailState[] trailStates;
 
     modifier onlyGovernor {
         require(msg.sender == governorAddress, "Only the Trail Governor can call this function");
@@ -43,6 +42,8 @@ contract TrailContract {
         require(msg.sender == controllerAddress, "Only the Trail Controller can call this function");
         _;
     }
+
+    event TrailRecordAdded(address indexed controller, uint32 stateIndex, bytes32 indexed stateHash);
 
     // Constructor is a special function which runs automatically on deployment.
     constructor(address governor, address controller, string memory immutableData, string memory recordData) {
@@ -59,18 +60,10 @@ contract TrailContract {
         trail.created = block.timestamp;
         trail.updated = block.timestamp;
 
-        lastTrailStateHash = calculateLastState();
-        trailStates.push(TrailState(lastTrailStateHash, block.number));
-    }
+        lastTrailState = TrailState(calculateLastState(), block.number);
+        firstTrailState = lastTrailState;
 
-    /**
-     *. Returns the Trail State at a particular state Index.
-     */
-    function getTrailState(uint32 _stateIndex) external view returns (TrailState memory) {
-        if (_stateIndex > trail.stateIndex) {
-            revert("Invalid state index");
-        }
-        return trailStates[_stateIndex];
+        emit TrailRecordAdded(controllerAddress, trail.stateIndex, lastTrailState.state);
     }
 
     /**
@@ -88,7 +81,7 @@ contract TrailContract {
     }
 
     function addRecord(string calldata recordData, bytes32 fromStateHash) external onlyController {
-        if (lastTrailStateHash != fromStateHash) {
+        if (lastTrailState.state != fromStateHash) {
             revert("Invalid state");
         }
 
@@ -97,8 +90,9 @@ contract TrailContract {
 
         trail.updated = block.timestamp;
 
-         lastTrailStateHash = calculateLastState();
-         trailStates.push(TrailState(lastTrailStateHash, block.number));
+         lastTrailState = TrailState(calculateLastState(), block.number);
+
+         emit TrailRecordAdded(controllerAddress, trail.stateIndex, lastTrailState.state);
     }
 
     function changeController(address newController) external onlyGovernor {
@@ -110,10 +104,15 @@ contract TrailContract {
     }
     
     function trailID() external view returns (string memory) {
+        return calculateTrailID();
+    }
+
+    function calculateTrailID() internal view returns (string memory) {
         uint256 chainID = getChainID();
 
         return string.concat("urn:trail:iota:evm:", Strings.toString(chainID),":", Strings.toHexString(address(this)));
     }
+
 
     function getChainID() internal view returns (uint256) {
        return block.chainid;

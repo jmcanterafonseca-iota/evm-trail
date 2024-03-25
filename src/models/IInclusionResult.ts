@@ -1,5 +1,11 @@
 export interface IInclusionResult {
-    included: boolean;
-    blockNumber?: number;
-    timestamp?: string;
+    inclusionProofed: boolean;
+    claims?: unknown;
+    proof?: {
+        type: string;
+        transactionHash: string;
+        transactionIndex: number;
+        blockNumber: number;
+        timestamp: string;
+    };
 }

@@ -40,11 +40,10 @@ export class TrailResolver {
         const created = new Date(Number(trailData[3]) * 1000).toISOString();
         const updated = new Date(Number(trailData[4]) * 1000).toISOString();
 
-        const lastTrailStateHash = await contract.lastTrailStateHash();
-        App.LDebug("Last trail State Hash", lastTrailStateHash);
+        const firstTrailState = await contract.firstTrailState();
+        const lastTrailState = await contract.lastTrailState();
 
-        const firstTrailState = await contract.getTrailState(0);
-        const lastTrailState = await contract.getTrailState(stateIndex);
+        App.LDebug(firstTrailState, lastTrailState);
 
         return {
             trail: {
@@ -58,7 +57,7 @@ export class TrailResolver {
                 updated,
                 governor,
                 controller,
-                lastTrailStateHash,
+                lastTrailStateHash: lastTrailState[0],
                 firstInclusionBlock: Number(firstTrailState[1]),
                 lastInclusionBlock: Number(lastTrailState[1])
             }
