@@ -30,15 +30,16 @@ export class TrailInclusionService {
             record,
             immutable: immutableData
         };
+        const trailIdDetails = { id: trailID };
 
         if (trail.trail.stateIndex < inState) {
-            return { claims, inclusionProofed: false };
+            return { trail: trailIdDetails, claims, inclusionProofed: false };
         }
 
         if (immutableData) {
             const toCheck = JSON.stringify(immutableData);
             if (toCheck !== JSON.stringify(trail.trail.immutable)) {
-                return { claims, inclusionProofed: false };
+                return { trail: trailIdDetails, claims, inclusionProofed: false };
             }
         }
 
@@ -69,7 +70,7 @@ export class TrailInclusionService {
         });
 
         if (logs.length === 0) {
-            return { claims, inclusionProofed: false };
+            return { trail: trailIdDetails, claims, inclusionProofed: false };
         }
 
         const logEntry = logs[0];
@@ -77,6 +78,7 @@ export class TrailInclusionService {
         const blockDetails = await logEntry.getBlock();
 
         return {
+            trail: trailIdDetails,
             claims,
             inclusionProofed: true,
             proof: {
