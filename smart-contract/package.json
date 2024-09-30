@@ -8,7 +8,9 @@
     },
     "scripts": {
       "test": "echo \"Error: no test specified\" && exit 1",
-      "build": "truffle build"
+      "build": "truffle build",
+      "deploy": "truffle migrate --network stable",
+      "force-deploy": "truffle migrate --reset --network stable"
     },
     "author": "IOTA Foundation",
     "license": "MIT",

@@ -1,0 +1,4 @@
+{
+    "did": "did:ethr:0x432:0x901736197B5cbeea18b9058a2eD370dADe2B7031",
+    "privateKey": "b305f4fe776d48408ae7c6572c40f3019fd6ccaac3575c45a8973d7433027809"
+}
